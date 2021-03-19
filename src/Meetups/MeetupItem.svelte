@@ -78,7 +78,7 @@
   }
 </style>
 
-<article>
+<article >
   <header>
     <h1>
       {title}

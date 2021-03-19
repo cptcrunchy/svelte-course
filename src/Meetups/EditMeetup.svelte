@@ -37,7 +37,6 @@
   $: descriptionValid = !isEmpty(description);
   $: emailValid = isValidEmail(email);
   $: formIsValid = [titleValid, subTitleValid, addressValid, emailValid, descriptionValid].every(Boolean);
-  $: console.log(emailValid)
       
   function submitForm() {
     const meetupData = {
@@ -51,7 +50,7 @@
     if(meetupId){
         meetupStore.updateMeetup(meetupId, meetupData);
     } else {
-        meetupStore.addMeetup(newMeetup);
+        meetupStore.addMeetup(meetupData);
     }
     dispatch('save')
   }
