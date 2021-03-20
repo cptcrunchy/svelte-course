@@ -48,15 +48,51 @@
       address: address
     };
     if(meetupId){
+        fetch(`https://test-firebase-logins.firebaseio.com/meetups/${meetupId}.json`, {
+          method: "PATCH",
+          body: JSON.stringify(meetupData),
+          headers:{ 'Content-Type': 'application/json' }
+        }).then(res => {
+          if(!res.ok) throw new Error('An error occurred');
+          meetups.updateMeetup(meetupId, meetupData)
+        }).catch(err => {
+          console.error(err)
+        })
         meetupStore.updateMeetup(meetupId, meetupData);
     } else {
-        meetupStore.addMeetup(meetupData);
+        fetch("https://test-firebase-logins.firebaseio.com/meetups.json", {
+          method: 'POST',
+          body: JSON.stringify({...meetupData, isFavorite: false}),
+          headers:{ 'Content-Type': 'application/json' }
+        })
+        .then(res => {
+          if(!res.ok) throw new Error('An error occurred.');
+          return res.json()
+        })
+        .then(data => {
+          meetupStore.addMeetup({
+            ...meetupData,
+            isFavorite: false,
+            id: data.name
+          })
+        })
+        .catch(err =>{
+          console.error(err)
+        })
+        // meetupStore.addMeetup(meetupData);
     }
     dispatch('save')
   }
 
   function deleteMeetup() {
-      meetupStore.deleteMeetup(meetupId)
+    fetch(`https://test-firebase-logins.firebaseio.com/meetups/${meetupId}.json`, {
+          method: "DELETE",
+         }).then(res => {
+          if(!res.ok) throw new Error('An error occurred');
+          meetups.deleteMeetup(meetupId)
+        }).catch(err => {
+          console.error(err)
+        })
       dispatch("save")
   }
 

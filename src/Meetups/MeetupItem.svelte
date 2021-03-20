@@ -13,10 +13,24 @@
   export let email;
   export let isFav;
 
+  let isLoading = false;
+
   const dispatch = createEventDispatcher();
 
   function toggleFavorite() {
-    meetupStore.toggleFavorite(id)
+    isLoading = true;
+    fetch(`https://test-firebase-logins.firebaseio.com/meetups/${id}.json`, {
+      method: "PATCH",
+      body: JSON.stringify({isFavorite: !isFav }),
+      headers:{ 'Content-Type': 'application/json' }
+    }).then(res => {
+      if(!res.ok) throw new Error('An error occurred');
+      isLoading = false;
+      meetupStore.toggleFavorite(id)
+    }).catch(err => {
+      isLoading = false;
+      console.error(err)
+    })
   }
 </script>
 
@@ -78,6 +92,7 @@
   }
 </style>
 
+
 <article >
   <header>
     <h1>
@@ -97,13 +112,18 @@
   </div>
   <footer>
     <Button mode="outline" type="button" on:click={() => dispatch('edit', id)}>Edit</Button>
-    <Button
-      mode="outline"
-      color={isFav ? null : 'success'}
-      type="button"
-      on:click={toggleFavorite}>
-      {isFav ? 'Unfavorite' : 'Favorite'}
-    </Button>
+    {#if isLoading}
+      <!-- <LoadingSpinner /> -->
+      <span>Changing...</span>
+    {:else}
+      <Button
+        mode="outline"
+        color={isFav ? null : 'success'}
+        type="button"
+        on:click={toggleFavorite}>
+        {isFav ? 'Unfavorite' : 'Favorite'}
+      </Button>
+    {/if}
     <Button type="button" on:click={() => dispatch('showdetails', id)}>Show Details</Button>
   </footer>
 </article>
